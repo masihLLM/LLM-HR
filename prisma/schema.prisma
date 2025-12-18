@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js" 
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Chat {
+  id        String    @id @default(cuid())
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+  
+  @@map("chats")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  role      String   // "user" | "assistant"
+  content   String
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  // For tool calls and metadata (stored as JSON strings for SQLite compatibility)
+  toolCalls String?  // JSON string
+  metadata  String?  // JSON string
+  
+  @@map("messages")
+}
+
+model AppSettings {
+  id            Int      @id @default(1)
+  openaiBaseUrl String?
+  openaiApiKey  String?
+  postgresUrl   String?
+  updatedAt     DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+// HR Entities
+// Note: SQLite doesn't support enums, so we use String with @default
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          String    @default("Employee") // HR_Admin, HR_Manager, Employee, Finance
+  permissions   String?   // JSON string for dynamic permissions
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Employee {
+  id               String            @id @default(cuid())
+  firstName        String            @map("first_name")
+  lastName         String            @map("last_name")
+  nationalId       String            @unique @map("national_id")
+  dateOfBirth      DateTime          @map("date_of_birth")
+  gender           String            // Male, Female, Other
+  phoneNumber      String?           @map("phone_number")
+  email            String?
+  address          String?
+  jobTitle         String            @map("job_title")
+  department       String
+  employmentStatus String            @default("Active") @map("employment_status") // Active, Onboarding, Terminated, Archived
+  hireDate         DateTime          @map("hire_date")
+  terminationDate  DateTime?         @map("termination_date")
+  salary           Float
+  benefits         String?           // JSON string for insurance, allowances, etc.
+  leaveBalance     Int               @default(0) @map("leave_balance")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  
+  contracts        Contract[]
+  letters          AdministrativeLetter[]
+  attendance       AttendanceRecord[]
+  payrolls         Payroll[]
+  employeeBenefits Benefit[]
+
+  @@map("employees")
+}
+
+model Contract {
+  id                String       @id @default(cuid())
+  employeeId        String       @map("employee_id")
+  employee          Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  contractType      String       @map("contract_type") // Permanent, Temporary, Internship, Consultant
+  startDate         DateTime     @map("start_date")
+  endDate           DateTime?    @map("end_date")
+  signedByEmployee  Boolean      @default(false) @map("signed_by_employee")
+  signedByHr        Boolean      @default(false) @map("signed_by_hr")
+  documentUrl       String?      @map("document_url")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  @@map("contracts")
+}
+
+model AdministrativeLetter {
+  id          String     @id @default(cuid())
+  employeeId  String     @map("employee_id")
+  employee    Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  letterType  String     @map("letter_type") // Confirmation, Termination, Promotion, Warning, Other
+  issuedDate  DateTime   @default(now()) @map("issued_date")
+  content     String     // Text or JSON template + variables
+  documentUrl String?    @map("document_url")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@map("administrative_letters")
+}
+
+model AttendanceRecord {
+  id            String      @id @default(cuid())
+  employeeId    String      @map("employee_id")
+  employee      Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date          DateTime
+  checkInTime   DateTime?   @map("check_in_time")
+  checkOutTime  DateTime?  @map("check_out_time")
+  hoursWorked   Float?      @default(0) @map("hours_worked")
+  overtimeHours Float?      @default(0) @map("overtime_hours")
+  leaveType     String      @default("None") @map("leave_type") // Sick, Vacation, Unpaid, None
+  leaveStatus   String?     @map("leave_status") // Requested, Approved, Rejected
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@map("attendance_records")
+}
+
+model Payroll {
+  id          String        @id @default(cuid())
+  employeeId  String        @map("employee_id")
+  employee    Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  periodStart DateTime      @map("period_start")
+  periodEnd   DateTime      @map("period_end")
+  baseSalary  Float         @map("base_salary")
+  overtimePay Float         @default(0) @map("overtime_pay")
+  deductions  String?       // JSON string for tax, insurance, penalties
+  netSalary   Float         @map("net_salary")
+  status      String        @default("Pending") // Pending, Calculated, Verified, Approved, Paid
+  paymentDate DateTime?     @map("payment_date")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("payrolls")
+}
+
+model Benefit {
+  id          String      @id @default(cuid())
+  employeeId  String      @map("employee_id")
+  employee    Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  benefitType String      @map("benefit_type") // Insurance, Housing, Transport, Other
+  amount      Float
+  startDate   DateTime    @map("start_date")
+  endDate     DateTime?   @map("end_date")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@map("benefits")
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  entityType  String      @map("entity_type") // Employee, Contract, AdministrativeLetter, AttendanceRecord, Payroll, Benefit, User
+  entityId    String      @map("entity_id")
+  action      String      // Create, Update, Delete, Read
+  performedBy String?      @map("performed_by")
+  user        User?       @relation(fields: [performedBy], references: [id], onDelete: SetNull)
+  timestamp   DateTime    @default(now())
+  details     String?     // JSON string for what changed
+
+  @@map("audit_logs")
+}

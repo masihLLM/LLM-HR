@@ -30,6 +30,7 @@ import { ArtifactPane } from "@/components/artifacts/artifact-pane";
 import { useRouter } from "next/navigation";
 import { ConversationThread } from "@/components/assistant-ui/big-thread-migration/conversation-thread";
 import { getToken } from "@/lib/auth/client";
+import { AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 
 export const Assistant = ({ 
   chatId: propChatId, 
@@ -57,9 +58,21 @@ export const Assistant = ({
     setPendingStarter(starterPrompt ?? null);
   }, [starterPrompt]);
   
+  // Create transport with JWT token in headers
+  const transport = React.useMemo(() => {
+    const token = getToken();
+    return new AssistantChatTransport({
+      api: "/api/chat",
+      headers: token ? {
+        Authorization: `Bearer ${token}`,
+      } : undefined,
+    });
+  }, []);
+
   const runtime = useChatRuntime({
     id: currentChatId,
     messages: initialMessages,
+    transport,
   });
 
   React.useEffect(() => {

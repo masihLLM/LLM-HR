@@ -38,4 +38,17 @@ export const DropdownMenuItem = React.forwardRef<
   );
 });
 
+export const DropdownMenuSeparator = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
+>(function DropdownMenuSeparator({ className, ...props }, ref) {
+  return (
+    <DropdownMenuPrimitive.Separator
+      ref={ref}
+      className={"-mx-1 my-1 h-px bg-muted " + (className ?? "")}
+      {...props}
+    />
+  );
+});
+
 

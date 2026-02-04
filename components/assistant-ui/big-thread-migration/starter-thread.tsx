@@ -95,7 +95,7 @@ import { cn } from "@/lib/utils";
            transition={{ delay: 0.3 }}
            className="text-muted-foreground/65 text-2xl"
          >
-           How can I help you today?
+           As an AI HR Admin Assistant.
          </motion.div>
        </div>
 

@@ -7,7 +7,7 @@ type UserRole = "HR_Admin" | "HR_Manager" | "Employee" | "Finance";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password, role } = body;
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -37,11 +37,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if this is the first user (allow HR_Admin role)
-    const userCount = await prisma.user.count();
-    const userRole: UserRole = userCount === 0 
-      ? "HR_Admin" 
-      : (role && ["HR_Admin", "HR_Manager", "Employee", "Finance"].includes(role) ? role as UserRole : "Employee");
+    // Normal signup: always create Employee users
+    const userRole: UserRole = "Employee";
 
     // Hash password
     const passwordHash = await hashPassword(password);

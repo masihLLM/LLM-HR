@@ -34,7 +34,10 @@ export function SearchModal({ open, onOpenChange, onChatSelect }: SearchModalPro
   React.useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await fetch('/api/chats?page=1&limit=50')
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const response = await fetch('/api/chats?page=1&limit=50', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+        })
         const data = await response.json()
         const formattedChats = data.chats.map((chat: any) => ({
           id: chat.id,

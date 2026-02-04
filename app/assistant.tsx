@@ -58,14 +58,21 @@ export const Assistant = ({
     setPendingStarter(starterPrompt ?? null);
   }, [starterPrompt]);
   
-  // Create transport with JWT token in headers
+  // Create transport with JWT token in headers (using custom fetch to always get latest token)
   const transport = React.useMemo(() => {
-    const token = getToken();
     return new AssistantChatTransport({
       api: "/api/chat",
-      headers: token ? {
-        Authorization: `Bearer ${token}`,
-      } : undefined,
+      fetch: (url, options = {}) => {
+        const token = getToken();
+        const headers = new Headers(options.headers);
+        if (token) {
+          headers.set('Authorization', `Bearer ${token}`);
+        }
+        return fetch(url, {
+          ...options,
+          headers,
+        });
+      },
     });
   }, []);
 

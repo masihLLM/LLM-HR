@@ -87,7 +87,7 @@ import { cn } from "@/lib/utils";
            transition={{ delay: 0.2 }}
            className="text-3xl font-semibold"
          >
-           I&apos;m AGpt!
+           Hello!
          </motion.div>
          <motion.div
            initial={{ opacity: 0, y: 10 }}

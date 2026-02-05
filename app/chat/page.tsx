@@ -12,15 +12,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { SearchModal } from "@/components/search-modal";
@@ -84,49 +75,40 @@ export default function ChatPage() {
         <div className="relative flex h-dvh w-full pr-0.5">
           <AppSidebar />
           <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <SidebarTrigger />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#"></BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>New chat</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-              <div className="ml-auto flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSearchModalOpen(true)}
-                  className="h-8 w-8"
-                >
-                  <Search className="h-4 w-4" />
-                  <span className="sr-only">Search chats</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSettingsOpen(true)}
-                  className="h-8 w-8"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span className="sr-only">Settings</span>
-                </Button>
-                <ThemeToggle />
+            <div className="flex h-16 shrink-0 items-center gap-2 px-4">
+              <div className="pointer-events-none absolute left-4 right-4 top-4 z-10 flex items-center justify-between gap-2">
+                <SidebarTrigger className="pointer-events-auto" />
+                <div className="pointer-events-auto flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSearchModalOpen(true)}
+                    className="h-8 w-8"
+                  >
+                    <Search className="h-4 w-4" />
+                    <span className="sr-only">Search chats</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSettingsOpen(true)}
+                    className="h-8 w-8"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span className="sr-only">Settings</span>
+                  </Button>
+                  <ThemeToggle />
+                </div>
               </div>
-            </header>
-            <div className="flex-1 overflow-hidden">
-              <StarterThread
-                onSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
-                error={threadError}
-              />
-            </div>
+
+            </div>         
+                 <div className="flex-1 overflow-hidden pt-14">
+                <StarterThread
+                  onSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                  error={threadError}
+                />
+              </div>
           </SidebarInset>
         </div>
       </SidebarProvider>

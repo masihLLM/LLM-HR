@@ -4,21 +4,8 @@ import * as React from "react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { UIMessage } from "ai";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchModal } from "@/components/search-modal";
 import { Search } from "lucide-react";
@@ -143,24 +130,12 @@ const AssistantInner: React.FC<{
       <SidebarProvider>
         <div className="flex h-dvh w-full pr-0.5 relative">
           <AppSidebar />
-          <SidebarInset className={isPaneOpen ? "lg:mr-0" : ""}>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <SidebarTrigger />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage></BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-              <div className="ml-auto flex items-center gap-2">
+          <SidebarInset className={`${isPaneOpen ? "lg:mr-0 " : ""}relative`}>
+            <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2">
+              <SidebarTrigger className="pointer-events-auto" />
+            </div>
+            <div className="pointer-events-none absolute right-4 top-4 z-10">
+              <div className="pointer-events-auto flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -181,7 +156,8 @@ const AssistantInner: React.FC<{
                 </Button>
                 <ThemeToggle />
               </div>
-            </header>
+            </div>
+
             <div className="flex-1 overflow-hidden">
               <ConversationThread />
             </div>
